@@ -24,6 +24,7 @@ import android.util.Log;
 
 import com.eveningoutpost.dexdrip.R;
 import com.eveningoutpost.dexdrip.UtilityModels.CollectionServiceStarter;
+import com.eveningoutpost.dexdrip.UtilityModels.Constants;
 import com.eveningoutpost.dexdrip.UtilityModels.ForegroundServiceStarter;
 import com.eveningoutpost.dexdrip.UtilityModels.PebbleSync;
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -33,7 +34,10 @@ import com.nightscout.core.barcode.NSBarcodeConfig;
 import net.tribe7.common.base.Joiner;
 
 import java.net.URI;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
@@ -170,6 +174,36 @@ public class Preferences extends PreferenceActivity {
                         index >= 0
                                 ? listPreference.getEntries()[index]
                                 : null);
+
+                //handle unit conversions
+                if (preference.getKey().equals("units")){
+                    SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(preference.getContext());
+
+
+
+
+                    if(listPreference.getEntry().equals("mgdl") && stringValue.equals("mmol")){
+                        // mgdl -> mmol
+                        double convertedHigh = Double.parseDouble(sp.getString("highValue", "170")) * Constants.MGDL_TO_MMOLL;
+                        double convertedLow = Double.parseDouble(sp.getString("lowValue", "70")) * Constants.MGDL_TO_MMOLL;
+                        DecimalFormat df = new DecimalFormat("#", new DecimalFormatSymbols(Locale.ENGLISH));
+                        df.setMaximumFractionDigits(1);
+                        SharedPreferences.Editor editor = sp.edit();
+                        editor.putString("highValue", df.format(convertedHigh));
+                        editor.putString("lowValue", df.format(convertedLow));
+                        editor.apply();
+                    } else if (listPreference.getEntry().equals("mmol") && stringValue.equals("mgdl")){
+                        // mmol -> mgdl
+                        double convertedHigh = Double.parseDouble(sp.getString("highValue", "9.4")) * Constants.MMOLL_TO_MGDL;
+                        double convertedLow = Double.parseDouble(sp.getString("lowValue", "3.9")) * Constants.MMOLL_TO_MGDL;
+                        DecimalFormat df = new DecimalFormat("#", new DecimalFormatSymbols(Locale.ENGLISH));
+                        df.setMaximumFractionDigits(0);
+                        SharedPreferences.Editor editor = sp.edit();
+                        editor.putString("highValue", df.format(convertedHigh));
+                        editor.putString("lowValue", df.format(convertedLow));
+                        editor.apply();
+                    }
+                }
 
             } else if (preference instanceof RingtonePreference) {
                 // For ringtone preferences, look up the correct display value
