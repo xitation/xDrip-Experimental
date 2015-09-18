@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
 import android.os.BatteryManager;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
@@ -13,6 +14,7 @@ import com.eveningoutpost.dexdrip.Models.BgReading;
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Date;
 import java.util.TimeZone;
 import java.util.UUID;
@@ -22,14 +24,6 @@ import java.util.UUID;
  */
 public class PebbleSync extends Service {
     private final static String TAG = PebbleSync.class.getSimpleName();
-    //    CGM_ICON_KEY = 0x0,		// TUPLE_CSTRING, MAX 2 BYTES (10)
-    //    CGM_BG_KEY = 0x1,		// TUPLE_CSTRING, MAX 4 BYTES (253 OR 22.2)
-    //    CGM_TCGM_KEY = 0x2,		// TUPLE_INT, 4 BYTES (CGM TIME)
-    //    CGM_TAPP_KEY = 0x3,		// TUPLE_INT, 4 BYTES (APP / PHONE TIME)
-    //    CGM_DLTA_KEY = 0x4,		// TUPLE_CSTRING, MAX 5 BYTES (BG DELTA, -100 or -10.0)
-    //    CGM_UBAT_KEY = 0x5,		// TUPLE_CSTRING, MAX 3 BYTES (UPLOADER BATTERY, 100)
-    //    CGM_NAME_KEY = 0x6		// TUPLE_CSTRING, MAX 9 BYTES (xDrip)
-    //public static final UUID PEBBLEAPP_UUID = UUID.fromString("2c3f5ab3-7506-44e7-b8d0-2c63de32e1ec");
     public static final UUID PEBBLEAPP_UUID = UUID.fromString("79f8ecb3-7214-4bfc-b996-cb95148ee6d3");
     public static final int ICON_KEY = 0;
     public static final int BG_KEY = 1;
@@ -38,6 +32,7 @@ public class PebbleSync extends Service {
     public static final int BG_DELTA_KEY = 4;
     public static final int UPLOADER_BATTERY_KEY = 5;
     public static final int NAME_KEY = 6;
+    public static final int TREND_KEY = 7;
 
     private Context mContext;
     private BgGraphBuilder bgGraphBuilder;
@@ -116,6 +111,20 @@ public class PebbleSync extends Service {
             dictionary.addString(UPLOADER_BATTERY_KEY, phoneBattery());
             dictionary.addString(NAME_KEY, "Phone");
         }
+        //create a sparkline bitmap to send to the pebble
+        Bitmap bgTrend = new BgSparklineBuilder(mContext)
+                .setHeightPx(84)
+                .setWidthPx(144)
+                .setStart(System.currentTimeMillis() - 60000 * 60 * 3)
+                .setBgGraphBuilder(bgGraphBuilder)
+                .build();
+        //create a ByteArrayOutputStream
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+
+        //compress the bitmap into a PNG.  This makes the transfer smaller
+        bgTrend.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        //add this to the dictionary.
+        dictionary.addBytes(TREND_KEY, stream.toByteArray());
         return dictionary;
     }
 
