@@ -292,6 +292,7 @@ public class Preferences extends PreferenceActivity {
             final Preference pebbleLowLine = findPreference("pebble_low_line");
             final Preference pebbleTrendPeriod = findPreference("pebble_trend_period");
             final Preference pebbleDelta = findPreference("pebble_show_delta");
+            final Preference pebbleShowArrows = findPreference("pebble_show_arrows");
             final EditTextPreference pebbleSpecialValue = (EditTextPreference) findPreference("pebble_special_value");
             bindPreferenceSummaryToValueAndEnsureNumeric(pebbleSpecialValue);
             final Preference pebbleSpecialText = findPreference("pebble_special_text");
@@ -417,6 +418,7 @@ public class Preferences extends PreferenceActivity {
                         pebbleCategory.addPreference(pebbleHighLine);
                         pebbleCategory.addPreference(pebbleLowLine);
                         pebbleCategory.addPreference(pebbleDelta);
+                        pebbleCategory.addPreference(pebbleShowArrows);
                         pebbleCategory.addPreference(pebbleTrendPeriod);
                         pebbleCategory.addPreference(pebbleSpecialValue);
                         pebbleCategory.addPreference(pebbleSpecialText);
@@ -426,6 +428,7 @@ public class Preferences extends PreferenceActivity {
                         pebbleCategory.removePreference(pebbleHighLine);
                         pebbleCategory.removePreference(pebbleLowLine);
                         pebbleCategory.addPreference(pebbleDelta);
+                        pebbleCategory.addPreference(pebbleShowArrows);
                         pebbleCategory.removePreference(pebbleTrendPeriod);
                         pebbleCategory.removePreference(pebbleSpecialValue);
                         pebbleCategory.removePreference(pebbleSpecialText);
@@ -468,6 +471,14 @@ public class Preferences extends PreferenceActivity {
                     return true;
                 }
             });
+            pebbleShowArrows.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue){
+                    Context context = preference.getContext();
+                    context.startService(new Intent(context, PebbleSync.class));
+                    return true;
+                }
+            });
 
            broadcastLocally.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                @Override
@@ -478,6 +489,8 @@ public class Preferences extends PreferenceActivity {
                        pebbleCategory.removePreference(pebbleHighLine);
                        pebbleCategory.removePreference(pebbleLowLine);
                        pebbleCategory.removePreference(pebbleTrendPeriod);
+                       pebbleCategory.removePreference(pebbleDelta);
+                       pebbleCategory.removePreference(pebbleShowArrows);
                        pebbleCategory.removePreference(pebbleSpecialValue);
                        pebbleCategory.removePreference(pebbleSpecialText);
                    }
@@ -532,8 +545,10 @@ public class Preferences extends PreferenceActivity {
 
                     if (((String) newValue).compareTo("DexbridgeWixel") != 0) {
                         collectionCategory.removePreference(transmitterId);
+                        collectionCategory.removePreference(displayBridgeBatt);
                     } else {
                         collectionCategory.addPreference(transmitterId);
+                        collectionCategory.addPreference(displayBridgeBatt);
                     }
 
                     String stringValue = newValue.toString();
