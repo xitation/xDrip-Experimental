@@ -23,6 +23,7 @@ import android.preference.SwitchPreference;
 import android.text.InputFilter;
 import android.text.TextUtils;
 import android.widget.Toast;
+
 import com.eveningoutpost.dexdrip.Models.UserError.Log;
 import com.eveningoutpost.dexdrip.Services.MissedReadingService;
 import com.eveningoutpost.dexdrip.R;
@@ -354,6 +355,8 @@ public class Preferences extends PreferenceActivity {
                 pebbleCategory.removePreference(pebbleTrendPeriod);
                 pebbleCategory.removePreference(pebbleSpecialValue);
                 pebbleCategory.removePreference(pebbleSpecialText);
+                pebbleCategory.removePreference(pebbleDelta);
+                pebbleCategory.removePreference(pebbleShowArrows);
             }
            if(prefs.getString("units", "mgdl").compareTo("mmol")!=0) {
                df = new DecimalFormat("#.#");
@@ -427,8 +430,8 @@ public class Preferences extends PreferenceActivity {
                         pebbleCategory.removePreference(pebbleTrend);
                         pebbleCategory.removePreference(pebbleHighLine);
                         pebbleCategory.removePreference(pebbleLowLine);
-                        pebbleCategory.addPreference(pebbleDelta);
-                        pebbleCategory.addPreference(pebbleShowArrows);
+                        pebbleCategory.removePreference(pebbleDelta);
+                        pebbleCategory.removePreference(pebbleShowArrows);
                         pebbleCategory.removePreference(pebbleTrendPeriod);
                         pebbleCategory.removePreference(pebbleSpecialValue);
                         pebbleCategory.removePreference(pebbleSpecialText);
