@@ -172,10 +172,10 @@ public class BgSparklineBuilder {
         lines.add(bgGraphBuilder.inRangeValuesLine());
         lines.add(bgGraphBuilder.lowValuesLine());
         lines.add(bgGraphBuilder.highValuesLine());
-        if (showLowLine)
-            lines.add(bgGraphBuilder.lowLine());
-        if (showHighLine)
-            lines.add(bgGraphBuilder.highLine());
+        //if (showLowLine)
+            lines.add(bgGraphBuilder.lowLine(showLowLine));
+        //if (showHighLine)
+            lines.add(bgGraphBuilder.highLine(showLowLine));
         if (useSmallDots) {
             for(Line line: lines)
                 line.setPointRadius(2);
